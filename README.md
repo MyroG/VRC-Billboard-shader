@@ -1,2 +1,2 @@
-# vrc-billboard-shader
-A billboard shader, optimized for VRChat
+# VRC Billboard Shader
+This is a very basic unlit billboard shader, optimized for VRChat.
