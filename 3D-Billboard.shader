@@ -1,4 +1,4 @@
-﻿Shader "MyroP/Billboard"
+﻿Shader "MyroP/3D-Billboard"
 {
 	Properties
 	{
