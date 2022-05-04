@@ -3,8 +3,8 @@
 	Properties
 	{
 		_MainTex("Main texture", 2D) = "white" {}
-		_ThicknessFlatSide("Thickness on the flat side", Range(0.001, 1.0)) = 0.001
-		_ThicknessLargerSide("Thickness on the larger side", Range(0.001, 3.0)) = 1.0
+		_ThicknessFlatSide("Thickness on the flat side", Range(0.0, 1.0)) = 0.005
+		_ThicknessLargerSide("Thickness on the larger side", Range(0.0, 3.0)) = 1.0
 	}
 
 	SubShader
@@ -23,7 +23,7 @@
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
-
+			#define HALFPI 1.57079632675
 			struct v2f
 			{
 				fixed4 pos : SV_POSITION;
@@ -69,7 +69,7 @@
 				float3 cameraPosWP = cameraPosition - mul(unity_ObjectToWorld, float4(0,0,0,1));
 		
 				//get current Y rotation of the mesh
-				float meshAngleY = atan2(unity_ObjectToWorld._m02_m12_m22.z,unity_ObjectToWorld._m02_m12_m22.x);
+				float meshAngleY = atan2(unity_ObjectToWorld._m02_m12_m22.z,unity_ObjectToWorld._m02_m12_m22.x) + HALFPI;
 				float3 rotationAxisY = {0,1,0};
 				Unity_RotateAboutAxis_Radians_float(cameraPosWP, rotationAxisY, meshAngleY, cameraPosWP);
 
@@ -80,9 +80,9 @@
 				float2 cameraPos2DSpace = {cameraPosWP.x, cameraPosWP.z};
 				cameraPos2DSpace = normalize(cameraPos2DSpace);
 		
-				float2 perpendicular2DPlaneDirection = {-cameraPos2DSpace.x, cameraPos2DSpace.y};
+				float2 perpendicular2DPlaneDirection = {cameraPos2DSpace.y, -cameraPos2DSpace.x};
 		
-				float dotProduct = dot(vertex2DSpace, perpendicular2DPlaneDirection);
+				float dotProduct = dot(perpendicular2DPlaneDirection,vertex2DSpace);
 				float2 newPosition = perpendicular2DPlaneDirection * dotProduct;
 				newPosition -= (newPosition - vertex2DSpace) * _ThicknessFlatSide;
 				newPosition += perpendicular2DPlaneDirection * dotProduct * (_ThicknessLargerSide - 1.0);
