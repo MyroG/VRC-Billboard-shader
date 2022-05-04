@@ -1,5 +1,5 @@
 # 3D Billboard Shader for VRChat avatars
-This is a very basic unlit billboard shader, optimized for VRChat. It basically flattens any mesh based on the position of the camera, so from far away the mesh looks three dimensional, but it's actually 2D!
+This is a very basic unlit billboard shader, optimized for VRChat. It basically flattens any mesh based on the position of the camera, so from far away the avatar looks three dimensional, but not from close!
 
 <img src="https://i.imgur.com/4knFNx0.png" height=150/><img src="https://i.imgur.com/RgkCQwF.png" height=150/><img src="https://i.imgur.com/Duh4ds3.png" height=150/><img src="https://i.imgur.com/FP6M1wq.png" height=150/>
 
