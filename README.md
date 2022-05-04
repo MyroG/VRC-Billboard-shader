@@ -3,8 +3,6 @@ This is a very basic unlit billboard shader, optimized for VRChat. It basically 
 
 <img src="https://i.imgur.com/4knFNx0.png" height=150/><img src="https://i.imgur.com/RgkCQwF.png" height=150/><img src="https://i.imgur.com/Duh4ds3.png" height=150/><img src="https://i.imgur.com/FP6M1wq.png" height=150/>
 
-This shader should also work outside of VRC, but I haven't tried it out yet, it also works in VR.
-
 ## Settings
 
 This shader has three settings :
