@@ -19,5 +19,5 @@ Here's a little example with "Thickness on the larger side" set to 0.3
 
 ## How this shader works
 
-This shader flattens the mesh based on the position of the camera by moving vertices closer to a plane, this is done in the "v2f vert(appdata_full v)" function.
+This shader flattens the mesh based on the position of the camera by moving vertices closer to a plane, the plane is perpendicucal to the view direction of the camera, this is done in the "v2f vert(appdata_full v)" function.
 It's an unlit shader so the textures won't get affected by external light sources, but if you want you can copy the code from the "vert" function and paste it in other shaders to get a similar effect on other shaders.
