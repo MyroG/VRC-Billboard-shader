@@ -55,44 +55,55 @@
 			{
 				v2f o;
 
-				//Vertex snapping
+				///the code bellow starts the billboard effect
+
+				//we get the current position of the vertex in local space
 				float4 vertex = v.vertex;
 
-				//camera distance from the vertex
+				//we get the camera position in world space
+
 				#if UNITY_SINGLE_PASS_STEREO
-					//To avoid getting a weird stereotoscopic effect in VR, where the mesh on the left and right eye looks different...
-					float3 cameraPosition = (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) / 2;
+					//The user is in VR
+					//To avoid getting a weird 3D effect in VR, since there are two cameras in VR, we'll basically say that the camera is between both eyes...
+					float3 cameraPositionWS = (unity_StereoWorldSpaceCameraPos[0] + unity_StereoWorldSpaceCameraPos[1]) / 2;
 				#else
-					float3 cameraPosition = _WorldSpaceCameraPos;
+					//The user is on Desktop
+					float3 cameraPositionWS = _WorldSpaceCameraPos;
 				#endif
 
-				float3 cameraPosWP = cameraPosition - mul(unity_ObjectToWorld, float4(0,0,0,1));
+				//We convert the world space camera position to local space
+				float3 cameraPosLS = cameraPositionWS - mul(unity_ObjectToWorld, float4(0,0,0,1));
 		
-				//get current Y rotation of the mesh
+				//the vertex might have a rotation, we remove that rotation 
 				float meshAngleY = atan2(unity_ObjectToWorld._m02_m12_m22.z,unity_ObjectToWorld._m02_m12_m22.x) + HALFPI;
 				float3 rotationAxisY = {0,1,0};
-				Unity_RotateAboutAxis_Radians_float(cameraPosWP, rotationAxisY, meshAngleY, cameraPosWP);
+				Unity_RotateAboutAxis_Radians_float(cameraPosLS, rotationAxisY, meshAngleY, cameraPosLS);
 
-				//We will work will x and z
+				//Now we will snap the vertex on a flat plane
+				//To make the math a bit easier, I decided to only work with the x and z values, so only the x and z coordinates of the vertex will be modified
+
 				float2 vertex2DSpace = {vertex.x, vertex.z};
-		
-				//we don't need the y value
-				float2 cameraPos2DSpace = {cameraPosWP.x, cameraPosWP.z};
+				float2 cameraPos2DSpace = {cameraPosLS.x, cameraPosLS.z};
 				cameraPos2DSpace = normalize(cameraPos2DSpace);
 		
+				//cameraPos2DSpace is the camera position in local space without the y value, we want to snap each vertices on a plane 
+				//perpendicular of the camera's views 
 				float2 perpendicular2DPlaneDirection = {cameraPos2DSpace.y, -cameraPos2DSpace.x};
 		
+				//and here we do the math to snap the vertex on the plane
 				float dotProduct = dot(perpendicular2DPlaneDirection,vertex2DSpace);
 				float2 newPosition = perpendicular2DPlaneDirection * dotProduct;
 				newPosition -= (newPosition - vertex2DSpace) * _ThicknessFlatSide;
 				newPosition += perpendicular2DPlaneDirection * dotProduct * (_ThicknessLargerSide - 1.0);
 
+				//now we just need to show it on the viewport
 				vertex.x = newPosition.x;
 				vertex.z = newPosition.y;
 				vertex = UnityWorldToClipPos(mul (unity_ObjectToWorld, vertex));
-		
-				o.pos = vertex; 
 
+				//end of the code that snaps the vertex on a plane
+
+				o.pos = vertex; 
 				o.color = v.color;
 				o.uv_MainTex = TRANSFORM_TEX(v.texcoord, _MainTex);
 
