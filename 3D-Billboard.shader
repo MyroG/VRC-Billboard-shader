@@ -61,7 +61,6 @@
 				float4 vertex = v.vertex;
 
 				//we get the camera position in world space
-
 				#if UNITY_SINGLE_PASS_STEREO
 					//The user is in VR
 					//To avoid getting a weird 3D effect in VR, since there are two cameras in VR, we'll basically say that the camera is between both eyes...
@@ -74,27 +73,25 @@
 				//We convert the world space camera position to local space
 				float3 cameraPosLS = cameraPositionWS - mul(unity_ObjectToWorld, float4(0,0,0,1));
 		
-				//the vertex might have a rotation, we remove that rotation 
+				//the vertex might have a rotation, we remove that rotation
 				float meshAngleY = atan2(unity_ObjectToWorld._m02_m12_m22.z,unity_ObjectToWorld._m02_m12_m22.x) + HALFPI;
 				float3 rotationAxisY = {0,1,0};
 				Unity_RotateAboutAxis_Radians_float(cameraPosLS, rotationAxisY, meshAngleY, cameraPosLS);
 
 				//Now we will snap the vertex on a flat plane
 				//To make the math a bit easier, I decided to only work with the x and z values, so only the x and z coordinates of the vertex will be modified
-
 				float2 vertex2DSpace = {vertex.x, vertex.z};
 				float2 cameraPos2DSpace = {cameraPosLS.x, cameraPosLS.z};
 				cameraPos2DSpace = normalize(cameraPos2DSpace);
 		
-				//cameraPos2DSpace is the camera position in local space without the y value, we want to snap each vertices on a plane 
-				//perpendicular of the camera's views 
+				//cameraPos2DSpace is the camera position in local space without the y value, we want to snap each vertex on a perpendicular plane
 				float2 perpendicular2DPlaneDirection = {cameraPos2DSpace.y, -cameraPos2DSpace.x};
 		
 				//and here we do the math to snap the vertex on the plane
-				float dotProduct = dot(perpendicular2DPlaneDirection,vertex2DSpace);
-				float2 newPosition = perpendicular2DPlaneDirection * dotProduct;
-				newPosition -= (newPosition - vertex2DSpace) * _ThicknessFlatSide;
-				newPosition += perpendicular2DPlaneDirection * dotProduct * (_ThicknessLargerSide - 1.0);
+				float dotProduct = dot(perpendicular2DPlaneDirection,vertex2DSpace); //dot product of the vertex and the perpendicular place
+				float2 newPosition = perpendicular2DPlaneDirection * dotProduct; //the new position is on the plane
+				newPosition -= (newPosition - vertex2DSpace) * _ThicknessFlatSide; //but there's an issue, if we snap everything on a plane there will be z-fighting issues, so we need to separate the vertex a little bit from the plane
+				newPosition += perpendicular2DPlaneDirection * dotProduct * (_ThicknessLargerSide - 1.0); //just for fun, the vertex can be put closer or further to the center here,, to make the final mesh larger or narrower...
 
 				//now we just need to show it on the viewport
 				vertex.x = newPosition.x;
