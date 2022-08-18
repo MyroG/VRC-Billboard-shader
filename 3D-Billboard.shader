@@ -111,7 +111,7 @@
 
 			float4 frag(v2f IN) : COLOR
 			{
-				half4 c = tex2D(_MainTex, IN.uv_MainTex)*IN.color;
+				half4 c = tex2D(_MainTex, IN.uv_MainTex);
 				return  c;
 			}
 
